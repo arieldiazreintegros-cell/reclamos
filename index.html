@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Reclamos y Reintegros</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased font-sans flex flex-col bg-slate-50 min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid font-bold fa-file-invoice-dollar text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white leading-none">Módulo de Reintegros</h1>
+                        <span class="text-xs text-slate-400 font-medium">Gestión e Ingreso de Reclamos</span>
+                    </div>
+                </div>
+
+                <!-- Database Connection Status & Counters -->
+                <div class="flex items-center space-x-4 text-xs">
+                    <div id="db-status-badge" class="flex items-center space-x-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span id="db-ping-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                          <span id="db-ping-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                        </span>
+                        <span id="db-status-text" class="text-slate-300 font-medium">Conectando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Top Metrics Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-brand-50 text-brand-600 rounded-lg">
+                    <i class="fa-solid fa-list-check text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Reclamos</p>
+                    <p id="stat-total" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-lg">
+                    <i class="fa-solid fa-clock text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">En Espera / Auditoría</p>
+                    <p id="stat-pendientes" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-rose-50 text-rose-600 rounded-lg">
+                    <i class="fa-solid fa-layer-group text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Alto Costo (> $130k)</p>
+                    <p id="stat-alto-costo" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                    <i class="fa-solid fa-circle-check text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Liquidados</p>
+                    <p id="stat-liquidados" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Selector Tabs -->
+        <div class="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2">
+            <button id="tab-btn-form" onclick="switchTab('form')" class="py-3 px-6 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center space-x-2 focus:outline-none transition-colors">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Nuevo Reclamo</span>
+            </button>
+            <button id="tab-btn-table" onclick="switchTab('table')" class="py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 focus:outline-none transition-colors">
+                <i class="fa-solid fa-table-list"></i>
+                <span>Historial de Reclamos</span>
+                <span id="badge-total-claims" class="ml-1 bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full border border-slate-200">0</span>
+            </button>
+        </div>
+
+        <!-- FORM SECTION -->
+        <section id="view-form" class="bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-sm p-6 sm:p-8">
+            <form id="claimForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
+                
+                <!-- Section 1: Datos del Afiliado -->
+                <div>
+                    <div class="flex items-center justify-between pb-3 mb-6 border-b border-slate-100">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">1</span>
+                            Información del Afiliado
+                        </h2>
+                        <span id="afiliado-status-pill" class="hidden text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                            <!-- Filled dynamically -->
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <!-- N° de Afiliado (Format 000000/00) -->
+                        <div class="relative">
+                            <label for="numeroAfiliado" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                N° Afiliado <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <input type="text" id="numeroAfiliado" name="numeroAfiliado" required
+                                    placeholder="000000/00" maxlength="9"
+                                    oninput="handleAfiliadoInput(this)"
+                                    class="pl-10 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all uppercase tracking-wider font-mono">
+                            </div>
+                            <p class="mt-1 text-[11px] text-slate-400">Formato: 6 números / 2 números</p>
+                        </div>
+
+                        <!-- Nombre -->
+                        <div>
+                            <label for="nombre" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Nombre <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" id="nombre" name="nombre" required
+                                placeholder="Ej: Juan"
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                        </div>
+
+                        <!-- Apellido -->
+                        <div>
+                            <label for="apellido" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Apellido <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" id="apellido" name="apellido" required
+                                placeholder="Ej: Pérez"
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                        </div>
+
+                        <!-- Número de Teléfono -->
+                        <div>
+                            <label for="telefono" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Teléfono <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-phone"></i>
+                                </div>
+                                <input type="tel" id="telefono" name="telefono" required
+                                    placeholder="Ej: 1122334455"
+                                    class="pl-10 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                            </div>
+                        </div>
+
+                        <!-- Zona del Afiliado -->
+                        <div>
+                            <label for="zona" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Zona del Afiliado <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" id="zona" name="zona" required
+                                placeholder="Ej: Zona Sur, CABA, Oeste..."
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 2: Detalles del Reintegro -->
+                <div>
+                    <div class="pb-3 mb-6 border-b border-slate-100">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">2</span>
+                            Detalles de la Solicitud
+                        </h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        <!-- Monto -->
+                        <div>
+                            <label for="monto" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Monto ($) <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">
+                                    $
+                                </div>
+                                <input type="number" id="monto" name="monto" required step="0.01" min="0"
+                                    placeholder="0.00"
+                                    oninput="calculateTipoReintegro(this.value)"
+                                    class="pl-8 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 font-semibold focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                            </div>
+                        </div>
+
+                        <!-- Tipo de Reintegro (Calculado automáticamente) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Tipo de Reintegro <span class="text-xs font-normal text-slate-400">(Automático)</span>
+                            </label>
+                            <div id="tipoReintegroBox" class="h-[42px] px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500">
+                                <span id="tipoReintegroText">Ingrese un monto</span>
+                                <span id="tipoReintegroBadge" class="hidden text-xs px-2 py-0.5 rounded-full font-bold"></span>
+                            </div>
+                            <input type="hidden" id="tipoReintegro" name="tipoReintegro" value="">
+                        </div>
+
+                        <!-- Número de Orden de Pago (Opcional) -->
+                        <div>
+                            <label for="numeroOrdenPago" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                N° Orden de Pago <span class="text-xs font-normal text-slate-400">(Opcional)</span>
+                            </label>
+                            <input type="text" id="numeroOrdenPago" name="numeroOrdenPago"
+                                placeholder="Ej: OP-2026-889"
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                        </div>
+
+                        <!-- Delegación (Customizable Auto-saving Combobox) -->
+                        <div>
+                            <label for="delegacion" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Delegación <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="delegacion" name="delegacion" required list="delegacionesList"
+                                    placeholder="Seleccione o escriba..."
+                                    autocomplete="off"
+                                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                <datalist id="delegacionesList">
+                                    <!-- Populated dynamically from Firebase collection 'delegaciones' -->
+                                </datalist>
+                            </div>
+                            <p class="mt-1 text-[11px] text-slate-400">Si escribe un nombre nuevo, se guardará en la BD.</p>
+                        </div>
+
+                        <!-- Categoría / Concepto (Campo Desplegable Personalizable) -->
+                        <div>
+                            <label for="concepto" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Categoría / Concepto <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="concepto" name="concepto" required list="conceptosList"
+                                    placeholder="Seleccione o escriba concepto..."
+                                    autocomplete="off"
+                                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                <datalist id="conceptosList">
+                                    <!-- Populated dynamically from Firebase collection 'conceptos' -->
+                                </datalist>
+                            </div>
+                            <p class="mt-1 text-[11px] text-slate-400">Se guarda en la colección personalizada de conceptos.</p>
+                        </div>
+
+                        <!-- Fecha de Supuesto Pago -->
+                        <div>
+                            <label for="fechaSupuestoPago" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Fecha de Supuesto Pago <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="date" id="fechaSupuestoPago" name="fechaSupuestoPago" required
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 3: Estado y Descripción -->
+                <div>
+                    <div class="pb-3 mb-6 border-b border-slate-100">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">3</span>
+                            Estado y Descripción
+                        </h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <!-- Estado Dropdown -->
+                        <div>
+                            <label for="estado" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Estado del Reclamo <span class="text-rose-500">*</span>
+                            </label>
+                            <select id="estado" name="estado" required
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 font-semibold focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                <option value="A la espera" selected>A la espera</option>
+                                <option value="Auditándose">Auditándose</option>
+                                <option value="Aprobado">Aprobado</option>
+                                <option value="En proceso de pago">En proceso de pago</option>
+                                <option value="Liquidado">Liquidado</option>
+                                <option value="Rechazado">Rechazado</option>
+                            </select>
+                        </div>
+
+                        <!-- Descripción (TextArea) -->
+                        <div class="lg:col-span-2">
+                            <label for="descripcion" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Descripción / Observaciones <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea id="descripcion" name="descripcion" rows="3" required
+                                placeholder="Detalle los motivos del reclamo, comprobantes presentados o notas adicionales..."
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Submit and Reset Buttons -->
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="resetForm()"
+                        class="px-5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-all">
+                        <i class="fa-solid fa-rotate-left mr-2"></i> Limpiar Formulario
+                    </button>
+                    
+                    <button type="submit" id="btnSubmit"
+                        class="px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-md shadow-brand-600/30 transition-all flex items-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span id="btnSubmitText">Guardar Reclamo</span>
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- TABLE VIEW SECTION -->
+        <section id="view-table" class="hidden bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+            
+            <!-- Filters & Search -->
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between pb-4 border-b border-slate-100">
+                <div class="relative w-full md:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input type="text" id="tableSearch" oninput="filterClaimsTable()"
+                        placeholder="Buscar por afiliado, nombre, delegación..."
+                        class="pl-10 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                    <!-- Filter Estado -->
+                    <select id="filterEstado" onchange="filterClaimsTable()" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
+                        <option value="">Todos los Estados</option>
+                        <option value="A la espera">A la espera</option>
+                        <option value="Auditándose">Auditándose</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="En proceso de pago">En proceso de pago</option>
+                        <option value="Liquidado">Liquidado</option>
+                        <option value="Rechazado">Rechazado</option>
+                    </select>
+
+                    <!-- Filter Tipo -->
+                    <select id="filterTipo" onchange="filterClaimsTable()" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
+                        <option value="">Todos los Tipos</option>
+                        <option value="Alto costo">Alto costo</option>
+                        <option value="Bajo costo">Bajo costo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="px-4 py-3.5">N° Afiliado</th>
+                            <th class="px-4 py-3.5">Afiliado</th>
+                            <th class="px-4 py-3.5">Delegación / Categoría</th>
+                            <th class="px-4 py-3.5">Monto ($)</th>
+                            <th class="px-4 py-3.5">Tipo</th>
+                            <th class="px-4 py-3.5">Estado</th>
+                            <th class="px-4 py-3.5">Fecha Reclamo</th>
+                            <th class="px-4 py-3.5 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="claimsTableBody" class="divide-y divide-slate-100 bg-white">
+                        <!-- Filled dynamically -->
+                        <tr>
+                            <td colspan="8" class="text-center py-8 text-slate-400">
+                                <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
+                                Cargando reclamos desde Firebase...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal Details Viewer & Quick Edit -->
+    <div id="claimModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+            <div class="bg-slate-900 px-6 py-4 text-white flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-lines text-brand-400"></i>
+                    <h3 class="font-bold text-base" id="modalTitle">Detalles del Reclamo</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-sm" id="modalBody">
+                <!-- Dynamically populated modal content -->
+            </div>
+
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-3">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-xs transition-colors">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Firebase Modular SDK via CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+        import { 
+            getDatabase, 
+            ref, 
+            push, 
+            set, 
+            get, 
+            child, 
+            onValue, 
+            update 
+        } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCV3Wt6dX92Mx13OtTeo7tDjrnpowlxO48",
+            authDomain: "reintegros-808db.firebaseapp.com",
+            databaseURL: "https://reintegros-808db-default-rtdb.firebaseio.com",
+            projectId: "reintegros-808db",
+            storageBucket: "reintegros-808db.firebasestorage.app",
+            messagingSenderId: "560013503062",
+            appId: "1:560013503062:web:e13ca411951570cc5f29f7",
+            measurementId: "G-HNDK22KS65"
+        };
+
+        // Initialize Firebase & Realtime Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Global State
+        window.afiliadosCache = {};
+        window.delegacionesCache = [];
+        window.conceptosCache = [];
+        window.reclamosList = [];
+
+        // Update UI indicator for Database status
+        const dbStatusRef = ref(db, ".info/connected");
+        onValue(dbStatusRef, (snap) => {
+            const isConnected = snap.val() === true;
+            const badgeText = document.getElementById("db-status-text");
+            const pingDot = document.getElementById("db-ping-dot");
+            const pingPulse = document.getElementById("db-ping-pulse");
+
+            if (isConnected) {
+                badgeText.innerText = "Firebase Conectado";
+                pingDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
+                pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+            } else {
+                badgeText.innerText = "Desconectado / Offline";
+                pingDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500";
+                pingPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75";
+            }
+        });
+
+        // 1. Listen to Afiliados Collection
+        const afiliadosRef = ref(db, "afiliados");
+        onValue(afiliadosRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            window.afiliadosCache = data;
+            
+            // Re-trigger lookup if user is currently typing an affiliate
+            const currentNum = document.getElementById("numeroAfiliado").value;
+            if (currentNum) {
+                window.handleAfiliadoInput(document.getElementById("numeroAfiliado"));
+            }
+        });
+
+        // 2. Listen to Delegaciones Collection
+        const delegacionesRef = ref(db, "delegaciones");
+        onValue(delegacionesRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            window.delegacionesCache = Object.values(data);
+            updateDatalist("delegacionesList", window.delegacionesCache);
+        });
+
+        // 3. Listen to Conceptos Collection (Dynamic custom list)
+        const conceptosRef = ref(db, "conceptos");
+        onValue(conceptosRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            window.conceptosCache = Object.values(data);
+            updateDatalist("conceptosList", window.conceptosCache);
+        });
+
+        // 4. Listen to Reclamos Collection
+        const reclamosRef = ref(db, "reclamos");
+        onValue(reclamosRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            const list = [];
+            for (let key in data) {
+                list.push({ id: key, ...data[key] });
+            }
+            // Sort by createdAt descending
+            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            window.reclamosList = list;
+            
+            // Render Table & Metrics
+            window.renderClaimsTable();
+            window.updateMetrics();
+        });
+
+        // Helper to update datalists
+        function updateDatalist(elementId, items) {
+            const datalist = document.getElementById(elementId);
+            if (!datalist) return;
+            datalist.innerHTML = "";
+            const uniqueItems = [...new Set(items.map(i => typeof i === 'string' ? i : i.nombre))];
+            uniqueItems.sort().forEach(item => {
+                if (item) {
+                    const opt = document.createElement("option");
+                    opt.value = item;
+                    datalist.appendChild(opt);
+                }
+            });
+        }
+
+        // Handle affiliate input mask & database lookup
+        window.handleAfiliadoInput = function(input) {
+            let raw = input.value.replace(/\D/g, '').slice(0, 8); // Only digits, max 8
+            let formatted = raw;
+
+            if (raw.length > 6) {
+                formatted = raw.slice(0, 6) + '/' + raw.slice(6, 8);
+            }
+            input.value = formatted;
+
+            const pill = document.getElementById("afiliado-status-pill");
+            const cleanKey = formatted.replace('/', '_');
+
+            if (formatted.length === 9) { // Complete 000000/00 format
+                const existing = window.afiliadosCache[cleanKey];
+                if (existing) {
+                    // Populate fields
+                    document.getElementById("nombre").value = existing.nombre || '';
+                    document.getElementById("apellido").value = existing.apellido || '';
+                    document.getElementById("telefono").value = existing.telefono || '';
+                    document.getElementById("zona").value = existing.zona || '';
+
+                    pill.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1";
+                    pill.innerHTML = `<i class="fa-solid fa-user-check"></i> Afiliado Registrado`;
+                    pill.classList.remove("hidden");
+                } else {
+                    pill.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1";
+                    pill.innerHTML = `<i class="fa-solid fa-user-plus"></i> Nuevo Afiliado (Se guardará)`;
+                    pill.classList.remove("hidden");
+                }
+            } else {
+                pill.classList.add("hidden");
+            }
+        };
+
+        // Calculate Tipo de Reintegro based on $130,000 threshold
+        window.calculateTipoReintegro = function(value) {
+            const monto = parseFloat(value) || 0;
+            const textEl = document.getElementById("tipoReintegroText");
+            const badgeEl = document.getElementById("tipoReintegroBadge");
+            const hiddenEl = document.getElementById("tipoReintegro");
+
+            if (monto <= 0) {
+                textEl.innerText = "Ingrese un monto";
+                badgeEl.classList.add("hidden");
+                hiddenEl.value = "";
+                return;
+            }
+
+            if (monto > 130000) {
+                hiddenEl.value = "Alto costo";
+                textEl.innerText = "Reintegro de Alto Costo";
+                badgeEl.innerText = "Alto costo";
+                badgeEl.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-300";
+                badgeEl.classList.remove("hidden");
+            } else {
+                hiddenEl.value = "Bajo costo";
+                textEl.innerText = "Reintegro de Bajo Costo";
+                badgeEl.innerText = "Bajo costo";
+                badgeEl.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-teal-100 text-teal-800 border border-teal-300";
+                badgeEl.classList.remove("hidden");
+            }
+        };
+
+        // Form Submit Handler
+        window.handleFormSubmit = async function(event) {
+            event.preventDefault();
+
+            const btnSubmit = document.getElementById("btnSubmit");
+            const btnSubmitText = document.getElementById("btnSubmitText");
+            btnSubmit.disabled = true;
+            btnSubmitText.innerText = "Guardando...";
+
+            try {
+                const formData = new FormData(event.target);
+                const numeroAfiliado = formData.get("numeroAfiliado").trim();
+                const nombre = formData.get("nombre").trim();
+                const apellido = formData.get("apellido").trim();
+                const telefono = formData.get("telefono").trim();
+                const zona = formData.get("zona").trim();
+                const monto = parseFloat(formData.get("monto"));
+                const tipoReintegro = formData.get("tipoReintegro");
+                const numeroOrdenPago = formData.get("numeroOrdenPago").trim() || "N/A";
+                const delegacion = formData.get("delegacion").trim();
+                const concepto = formData.get("concepto").trim();
+                const fechaSupuestoPago = formData.get("fechaSupuestoPago");
+                const estado = formData.get("estado");
+                const descripcion = formData.get("descripcion").trim();
+
+                // Automatic claim date/time calculation
+                const now = new Date();
+                const fechaReclamoISO = now.toISOString();
+                const fechaReclamoFormatted = now.toLocaleDateString("es-AR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }) + " " + now.toLocaleTimeString("es-AR", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+                // 1. Save or Update Afiliado in 'afiliados' collection
+                const cleanAfiliadoKey = numeroAfiliado.replace('/', '_');
+                const afiliadoData = {
+                    numeroAfiliado,
+                    nombre,
+                    apellido,
+                    telefono,
+                    zona,
+                    ultimaActualizacion: fechaReclamoISO
+                };
+                await set(ref(db, `afiliados/${cleanAfiliadoKey}`), afiliadoData);
+
+                // 2. Save Delegación in 'delegaciones' collection if new
+                if (delegacion) {
+                    const cleanDelKey = delegacion.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                    await set(ref(db, `delegaciones/${cleanDelKey}`), { nombre: delegacion });
+                }
+
+                // 3. Save Concepto in 'conceptos' collection if new
+                if (concepto) {
+                    const cleanConcKey = concepto.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                    await set(ref(db, `conceptos/${cleanConcKey}`), { nombre: concepto });
+                }
+
+                // 4. Create new claim record in 'reclamos' collection
+                const newClaimRef = push(ref(db, "reclamos"));
+                const claimData = {
+                    numeroAfiliado,
+                    nombre,
+                    apellido,
+                    telefono,
+                    zona,
+                    monto,
+                    tipoReintegro,
+                    numeroOrdenPago,
+                    delegacion,
+                    concepto,
+                    fechaSupuestoPago,
+                    fechaReclamo: fechaReclamoISO,
+                    fechaReclamoFormateada: fechaReclamoFormatted,
+                    estado,
+                    descripcion,
+                    createdAt: Date.now()
+                };
+
+                await set(newClaimRef, claimData);
+
+                showToast("Reclamo guardado exitosamente con ID " + newClaimRef.key.slice(-6), "success");
+                resetForm();
+                
+                // Switch view to history table
+                switchTab('table');
+
+            } catch (error) {
+                console.error("Error al guardar el reclamo:", error);
+                showToast("Ocurrió un error al guardar en la base de datos", "error");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmitText.innerText = "Guardar Reclamo";
+            }
+        };
+
+        // Render claims history table
+        window.renderClaimsTable = function() {
+            const tbody = document.getElementById("claimsTableBody");
+            const searchVal = document.getElementById("tableSearch").value.toLowerCase();
+            const filterEstadoVal = document.getElementById("filterEstado").value;
+            const filterTipoVal = document.getElementById("filterTipo").value;
+
+            const filtered = window.reclamosList.filter(c => {
+                const matchesSearch = (
+                    c.numeroAfiliado?.toLowerCase().includes(searchVal) ||
+                    c.nombre?.toLowerCase().includes(searchVal) ||
+                    c.apellido?.toLowerCase().includes(searchVal) ||
+                    c.delegacion?.toLowerCase().includes(searchVal) ||
+                    c.concepto?.toLowerCase().includes(searchVal)
+                );
+                const matchesEstado = !filterEstadoVal || c.estado === filterEstadoVal;
+                const matchesTipo = !filterTipoVal || c.tipoReintegro === filterTipoVal;
+
+                return matchesSearch && matchesEstado && matchesTipo;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-12 text-slate-400">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-300"></i>
+                            No se encontraron reclamos registrados que coincidan con los filtros.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                const badgeColor = getEstadoBadgeStyle(c.estado);
+                const tipoBadge = c.tipoReintegro === "Alto costo" 
+                    ? `<span class="bg-rose-50 text-rose-700 font-bold border border-rose-200 px-2 py-0.5 rounded text-[11px]">Alto costo</span>`
+                    : `<span class="bg-teal-50 text-teal-700 font-bold border border-teal-200 px-2 py-0.5 rounded text-[11px]">Bajo costo</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-4 py-3.5 font-mono font-bold text-slate-900">${escapeHtml(c.numeroAfiliado)}</td>
+                        <td class="px-4 py-3.5">
+                            <div class="font-semibold text-slate-800">${escapeHtml(c.nombre)} ${escapeHtml(c.apellido)}</div>
+                            <div class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-[10px] mr-1"></i>${escapeHtml(c.zona)}</div>
+                        </td>
+                        <td class="px-4 py-3.5">
+                            <div class="font-medium text-slate-700">${escapeHtml(c.delegacion)}</div>
+                            <div class="text-xs text-brand-600 font-medium">${escapeHtml(c.concepto || '-')}</div>
+                        </td>
+                        <td class="px-4 py-3.5 font-bold text-slate-900">
+                            $${(c.monto || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td class="px-4 py-3.5">${tipoBadge}</td>
+                        <td class="px-4 py-3.5">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">
+                                ${escapeHtml(c.estado)}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3.5 text-xs text-slate-500">
+                            ${escapeHtml(c.fechaReclamoFormateada || '-')}
+                        </td>
+                        <td class="px-4 py-3.5 text-right space-x-1">
+                            <button onclick="viewClaimDetails('${c.id}')" class="p-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors" title="Ver Detalle">
+                                <i class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
+        window.filterClaimsTable = function() {
+            window.renderClaimsTable();
+        };
+
+        // Update Summary Metrics
+        window.updateMetrics = function() {
+            const list = window.reclamosList;
+            document.getElementById("stat-total").innerText = list.length;
+            document.getElementById("badge-total-claims").innerText = list.length;
+
+            const pendientes = list.filter(c => c.estado === "A la espera" || c.estado === "Auditándose").length;
+            document.getElementById("stat-pendientes").innerText = pendientes;
+
+            const altoCosto = list.filter(c => c.tipoReintegro === "Alto costo").length;
+            document.getElementById("stat-alto-costo").innerText = altoCosto;
+
+            const liquidados = list.filter(c => c.estado === "Liquidado").length;
+            document.getElementById("stat-liquidados").innerText = liquidados;
+        };
+
+        // View Modal Details
+        window.viewClaimDetails = function(claimId) {
+            const claim = window.reclamosList.find(c => c.id === claimId);
+            if (!claim) return;
+
+            const modalBody = document.getElementById("modalBody");
+            document.getElementById("modalTitle").innerText = `Reclamo: ${claim.numeroAfiliado}`;
+
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Afiliado</span>
+                            <p class="font-bold text-slate-800">${escapeHtml(claim.nombre)} ${escapeHtml(claim.apellido)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">N° Afiliado</span>
+                            <p class="font-mono font-bold text-brand-600">${escapeHtml(claim.numeroAfiliado)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Teléfono</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.telefono)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Zona</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.zona)}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 p-1">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Monto Solicitado</span>
+                            <p class="text-lg font-black text-slate-900">$${(claim.monto || 0).toLocaleString('es-AR', {minimumFractionDigits: 2})}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Tipo Reintegro</span>
+                            <p class="font-bold text-slate-800">${escapeHtml(claim.tipoReintegro)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Delegación</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.delegacion)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Categoría / Concepto</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.concepto)}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">N° Orden de Pago</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.numeroOrdenPago || 'No especificado')}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase">Fecha Supuesto Pago</span>
+                            <p class="font-medium text-slate-700">${escapeHtml(claim.fechaSupuestoPago)}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase block mb-1">Descripción</span>
+                        <p class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 leading-relaxed">${escapeHtml(claim.descripcion)}</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase block mb-1">Cambiar Estado</label>
+                            <select onchange="updateClaimStatus('${claim.id}', this.value)" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500">
+                                ${["A la espera", "Auditándose", "Aprobado", "En proceso de pago", "Liquidado", "Rechazado"].map(st => `
+                                    <option value="${st}" ${claim.estado === st ? 'selected' : ''}>${st}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="text-right text-xs text-slate-400">
+                            Registrado el:<br>
+                            <span class="font-medium text-slate-600">${escapeHtml(claim.fechaReclamoFormateada)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("claimModal").classList.remove("hidden");
+        };
+
+        window.updateClaimStatus = async function(claimId, newStatus) {
+            try {
+                await update(ref(db, `reclamos/${claimId}`), { estado: newStatus });
+                showToast("Estado actualizado correctamente", "success");
+            } catch(e) {
+                showToast("Error al cambiar estado", "error");
+            }
+        };
+
+        window.closeModal = function() {
+            document.getElementById("claimModal").classList.add("hidden");
+        };
+
+        // Reset Form Fields
+        window.resetForm = function() {
+            document.getElementById("claimForm").reset();
+            document.getElementById("afiliado-status-pill").classList.add("hidden");
+            document.getElementById("tipoReintegroBox").innerHTML = `
+                <span id="tipoReintegroText">Ingrese un monto</span>
+                <span id="tipoReintegroBadge" class="hidden text-xs px-2 py-0.5 rounded-full font-bold"></span>
+            `;
+            document.getElementById("tipoReintegro").value = "";
+        };
+
+        // Badge style helper
+        function getEstadoBadgeStyle(estado) {
+            switch(estado) {
+                case "Aprobado": return "bg-emerald-100 text-emerald-800 border border-emerald-300";
+                case "Liquidado": return "bg-blue-100 text-blue-800 border border-blue-300";
+                case "En proceso de pago": return "bg-indigo-100 text-indigo-800 border border-indigo-300";
+                case "Auditándose": return "bg-purple-100 text-purple-800 border border-purple-300";
+                case "Rechazado": return "bg-rose-100 text-rose-800 border border-rose-300";
+                case "A la espera":
+                default: return "bg-amber-100 text-amber-800 border border-amber-300";
+            }
+        }
+
+        // View Tab Switching
+        window.switchTab = function(tabName) {
+            const formView = document.getElementById("view-form");
+            const tableView = document.getElementById("view-table");
+            const tabBtnForm = document.getElementById("tab-btn-form");
+            const tabBtnTable = document.getElementById("tab-btn-table");
+
+            if (tabName === 'form') {
+                formView.classList.remove("hidden");
+                tableView.classList.add("hidden");
+
+                tabBtnForm.className = "py-3 px-6 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center space-x-2 focus:outline-none transition-colors";
+                tabBtnTable.className = "py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 focus:outline-none transition-colors";
+            } else {
+                formView.classList.add("hidden");
+                tableView.classList.remove("hidden");
+
+                tabBtnForm.className = "py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 focus:outline-none transition-colors";
+                tabBtnTable.className = "py-3 px-6 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center space-x-2 focus:outline-none transition-colors";
+            }
+        };
+
+        // Toast Messages
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+
+            const bgColor = type === 'success' ? 'bg-emerald-800 border-emerald-600' : 'bg-slate-900 border-slate-700';
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-triangle-exclamation text-amber-400';
+
+            toast.className = `flex items-center space-x-3 text-white px-4 py-3 rounded-xl shadow-2xl border ${bgColor} transform transition-all duration-300 text-xs font-medium pointer-events-auto`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-base"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
+        // Utility to prevent XSS injection
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
