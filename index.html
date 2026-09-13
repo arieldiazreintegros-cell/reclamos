@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-slate-50">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -41,18 +42,22 @@
             width: 6px;
             height: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
     </style>
 </head>
+
 <body class="h-full text-slate-800 antialiased font-sans flex flex-col bg-slate-50 min-h-screen">
 
     <!-- Top Navigation Bar -->
@@ -61,7 +66,8 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo and Title -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
                         <i class="fa-solid font-bold fa-file-invoice-dollar text-xl"></i>
                     </div>
                     <div>
@@ -72,10 +78,13 @@
 
                 <!-- Database Connection Status & Counters -->
                 <div class="flex items-center space-x-4 text-xs">
-                    <div id="db-status-badge" class="flex items-center space-x-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
+                    <div id="db-status-badge"
+                        class="flex items-center space-x-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
                         <span class="relative flex h-2.5 w-2.5">
-                          <span id="db-ping-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                          <span id="db-ping-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                            <span id="db-ping-pulse"
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span id="db-ping-dot"
+                                class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                         </span>
                         <span id="db-status-text" class="text-slate-300 font-medium">Conectando...</span>
                     </div>
@@ -132,47 +141,53 @@
 
         <!-- View Selector Tabs -->
         <div class="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2">
-            <button id="tab-btn-form" onclick="switchTab('form')" class="py-3 px-6 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center space-x-2 focus:outline-none transition-colors">
+            <button id="tab-btn-form" onclick="switchTab('form')"
+                class="py-3 px-6 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 flex items-center space-x-2 focus:outline-none transition-colors">
                 <i class="fa-solid fa-pen-to-square"></i>
                 <span>Nuevo Reclamo</span>
             </button>
-            <button id="tab-btn-table" onclick="switchTab('table')" class="py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 focus:outline-none transition-colors">
+            <button id="tab-btn-table" onclick="switchTab('table')"
+                class="py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 focus:outline-none transition-colors">
                 <i class="fa-solid fa-table-list"></i>
                 <span>Historial de Reclamos</span>
-                <span id="badge-total-claims" class="ml-1 bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full border border-slate-200">0</span>
+                <span id="badge-total-claims"
+                    class="ml-1 bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full border border-slate-200">0</span>
             </button>
         </div>
 
         <!-- FORM SECTION -->
         <section id="view-form" class="bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-sm p-6 sm:p-8">
             <form id="claimForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
-                
+
                 <!-- Section 1: Datos del Afiliado -->
                 <div>
                     <div class="flex items-center justify-between pb-3 mb-6 border-b border-slate-100">
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">1</span>
+                            <span
+                                class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">1</span>
                             Información del Afiliado
                         </h2>
-                        <span id="afiliado-status-pill" class="hidden text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                        <span id="afiliado-status-pill"
+                            class="hidden text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                             <!-- Filled dynamically -->
                         </span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        
+
                         <!-- N° de Afiliado (Format 000000/00) -->
                         <div class="relative">
-                            <label for="numeroAfiliado" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="numeroAfiliado"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 N° Afiliado <span class="text-rose-500">*</span>
                             </label>
                             <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-id-card"></i>
                                 </div>
                                 <input type="text" id="numeroAfiliado" name="numeroAfiliado" required
-                                    placeholder="000000/00" maxlength="9"
-                                    oninput="handleAfiliadoInput(this)"
+                                    placeholder="000000/00" maxlength="9" oninput="handleAfiliadoInput(this)"
                                     class="pl-10 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all uppercase tracking-wider font-mono">
                             </div>
                             <p class="mt-1 text-[11px] text-slate-400">Formato: 6 números / 2 números</p>
@@ -180,46 +195,47 @@
 
                         <!-- Nombre -->
                         <div>
-                            <label for="nombre" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="nombre"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Nombre <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" id="nombre" name="nombre" required
-                                placeholder="Ej: Juan"
+                            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan"
                                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
                         </div>
 
                         <!-- Apellido -->
                         <div>
-                            <label for="apellido" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="apellido"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Apellido <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" id="apellido" name="apellido" required
-                                placeholder="Ej: Pérez"
+                            <input type="text" id="apellido" name="apellido" required placeholder="Ej: Pérez"
                                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
                         </div>
 
                         <!-- Número de Teléfono -->
                         <div>
-                            <label for="telefono" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="telefono"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Teléfono <span class="text-rose-500">*</span>
                             </label>
                             <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                     <i class="fa-solid fa-phone"></i>
                                 </div>
-                                <input type="tel" id="telefono" name="telefono" required
-                                    placeholder="Ej: 1122334455"
+                                <input type="tel" id="telefono" name="telefono" required placeholder="Ej: 1122334455"
                                     class="pl-10 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
                             </div>
                         </div>
 
                         <!-- Zona del Afiliado -->
                         <div>
-                            <label for="zona" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="zona"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Zona del Afiliado <span class="text-rose-500">*</span>
                             </label>
-                            <input type="text" id="zona" name="zona" required
-                                placeholder="Ej: Zona Sur, CABA, Oeste..."
+                            <input type="text" id="zona" name="zona" required placeholder="Ej: Zona Sur, CABA, Oeste..."
                                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
                         </div>
 
@@ -230,102 +246,115 @@
                 <div>
                     <div class="pb-3 mb-6 border-b border-slate-100">
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">2</span>
+                            <span
+                                class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">2</span>
                             Detalles de la Solicitud
                         </h2>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                        <!-- Monto -->
-                        <div>
-                            <label for="monto" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                Monto ($) <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">
-                                    $
+                    <div id="claimsItems" class="space-y-4">
+                        <div class="claim-item rounded-xl border border-slate-200 bg-slate-50/60 p-4"
+                            data-claim-index="0">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold text-slate-700">Reclamo 1</h3>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                        Monto ($) <span class="text-rose-500">*</span>
+                                    </label>
+                                    <div class="relative rounded-md shadow-sm">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">
+                                            $</div>
+                                        <input type="number" name="monto" required step="0.01" min="0"
+                                            placeholder="0.00" oninput="calculateTipoReintegro(this)"
+                                            class="claim-monto pl-8 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 font-semibold focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                    </div>
                                 </div>
-                                <input type="number" id="monto" name="monto" required step="0.01" min="0"
-                                    placeholder="0.00"
-                                    oninput="calculateTipoReintegro(this.value)"
-                                    class="pl-8 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 font-semibold focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                        Tipo de Reintegro <span
+                                            class="text-xs font-normal text-slate-400">(Automático)</span>
+                                    </label>
+                                    <div
+                                        class="tipo-reintegro-box h-[42px] px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500">
+                                        <span class="tipo-reintegro-text">Ingrese un monto</span>
+                                        <span
+                                            class="tipo-reintegro-badge hidden text-xs px-2 py-0.5 rounded-full font-bold"></span>
+                                    </div>
+                                    <input type="hidden" name="tipoReintegro" value="">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                        N° Orden de Pago <span
+                                            class="text-xs font-normal text-slate-400">(Opcional)</span>
+                                    </label>
+                                    <input type="text" name="numeroOrdenPago" placeholder="Ej: OP-2026-889"
+                                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                        Categoría / Concepto <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="text" name="concepto" required list="conceptosList"
+                                        placeholder="Seleccione o escriba concepto..." autocomplete="off"
+                                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                        Fecha de Supuesto Pago <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="date" name="fechaSupuestoPago" required
+                                        aria-label="Fecha de supuesto pago"
+                                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Tipo de Reintegro (Calculado automáticamente) -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                Tipo de Reintegro <span class="text-xs font-normal text-slate-400">(Automático)</span>
-                            </label>
-                            <div id="tipoReintegroBox" class="h-[42px] px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500">
-                                <span id="tipoReintegroText">Ingrese un monto</span>
-                                <span id="tipoReintegroBadge" class="hidden text-xs px-2 py-0.5 rounded-full font-bold"></span>
-                            </div>
-                            <input type="hidden" id="tipoReintegro" name="tipoReintegro" value="">
-                        </div>
+                    <button type="button" onclick="addClaimItem()"
+                        class="mt-4 inline-flex items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-100 transition-colors">
+                        <i class="fa-solid fa-plus"></i> Agregar otro reclamo
+                    </button>
 
-                        <!-- Número de Orden de Pago (Opcional) -->
-                        <div>
-                            <label for="numeroOrdenPago" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                N° Orden de Pago <span class="text-xs font-normal text-slate-400">(Opcional)</span>
-                            </label>
-                            <input type="text" id="numeroOrdenPago" name="numeroOrdenPago"
-                                placeholder="Ej: OP-2026-889"
-                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
-                        </div>
-
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                         <!-- Delegación (Customizable Auto-saving Combobox) -->
                         <div>
-                            <label for="delegacion" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="delegacion"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Delegación <span class="text-rose-500">*</span>
                             </label>
                             <div class="relative">
                                 <input type="text" id="delegacion" name="delegacion" required list="delegacionesList"
-                                    placeholder="Seleccione o escriba..."
-                                    autocomplete="off"
+                                    placeholder="Seleccione o escriba..." autocomplete="off"
                                     class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
                                 <datalist id="delegacionesList">
                                     <!-- Populated dynamically from Firebase collection 'delegaciones' -->
                                 </datalist>
                             </div>
-                            <p class="mt-1 text-[11px] text-slate-400">Si escribe un nombre nuevo, se guardará en la BD.</p>
-                        </div>
-
-                        <!-- Categoría / Concepto (Campo Desplegable Personalizable) -->
-                        <div>
-                            <label for="concepto" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                Categoría / Concepto <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <input type="text" id="concepto" name="concepto" required list="conceptosList"
-                                    placeholder="Seleccione o escriba concepto..."
-                                    autocomplete="off"
-                                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
-                                <datalist id="conceptosList">
-                                    <!-- Populated dynamically from Firebase collection 'conceptos' -->
-                                </datalist>
-                            </div>
-                            <p class="mt-1 text-[11px] text-slate-400">Se guarda en la colección personalizada de conceptos.</p>
-                        </div>
-
-                        <!-- Fecha de Supuesto Pago -->
-                        <div>
-                            <label for="fechaSupuestoPago" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                Fecha de Supuesto Pago <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="date" id="fechaSupuestoPago" name="fechaSupuestoPago" required
-                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">
+                            <p class="mt-1 text-[11px] text-slate-400">Si escribe un nombre nuevo, se guardará en la BD.
+                            </p>
                         </div>
 
                     </div>
+
+                    <datalist id="conceptosList">
+                        <!-- Populated dynamically from Firebase collection 'conceptos' -->
+                    </datalist>
                 </div>
 
                 <!-- Section 3: Estado y Descripción -->
                 <div>
                     <div class="pb-3 mb-6 border-b border-slate-100">
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">3</span>
+                            <span
+                                class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black">3</span>
                             Estado y Descripción
                         </h2>
                     </div>
@@ -334,7 +363,8 @@
 
                         <!-- Estado Dropdown -->
                         <div>
-                            <label for="estado" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                            <label for="estado"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                                 Estado del Reclamo <span class="text-rose-500">*</span>
                             </label>
                             <select id="estado" name="estado" required
@@ -350,12 +380,14 @@
 
                         <!-- Descripción (TextArea) -->
                         <div class="lg:col-span-2">
-                            <label for="descripcion" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                Descripción / Observaciones <span class="text-rose-500">*</span>
+                            <label for="descripcion"
+                                class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                                Descripción / Observaciones <span
+                                    class="text-xs font-normal text-slate-400">(Opcional)</span>
                             </label>
-                            <textarea id="descripcion" name="descripcion" rows="3" required
+                            <textarea id="descripcion" name="descripcion" rows="3"
                                 placeholder="Detalle los motivos del reclamo, comprobantes presentados o notas adicionales..."
-                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"></textarea>
+                                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all">REVISAR SISTEMA</textarea>
                         </div>
 
                     </div>
@@ -367,7 +399,7 @@
                         class="px-5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 text-sm font-semibold transition-all">
                         <i class="fa-solid fa-rotate-left mr-2"></i> Limpiar Formulario
                     </button>
-                    
+
                     <button type="submit" id="btnSubmit"
                         class="px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-md shadow-brand-600/30 transition-all flex items-center space-x-2">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -379,8 +411,9 @@
         </section>
 
         <!-- TABLE VIEW SECTION -->
-        <section id="view-table" class="hidden bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-            
+        <section id="view-table"
+            class="hidden bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+
             <!-- Filters & Search -->
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between pb-4 border-b border-slate-100">
                 <div class="relative w-full md:w-80">
@@ -394,7 +427,8 @@
 
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
                     <!-- Filter Estado -->
-                    <select id="filterEstado" onchange="filterClaimsTable()" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
+                    <select id="filterEstado" aria-label="Filtrar por estado" onchange="filterClaimsTable()"
+                        class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
                         <option value="">Todos los Estados</option>
                         <option value="A la espera">A la espera</option>
                         <option value="Auditándose">Auditándose</option>
@@ -405,7 +439,8 @@
                     </select>
 
                     <!-- Filter Tipo -->
-                    <select id="filterTipo" onchange="filterClaimsTable()" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
+                    <select id="filterTipo" aria-label="Filtrar por tipo de reintegro" onchange="filterClaimsTable()"
+                        class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700">
                         <option value="">Todos los Tipos</option>
                         <option value="Alto costo">Alto costo</option>
                         <option value="Bajo costo">Bajo costo</option>
@@ -445,24 +480,28 @@
     </main>
 
     <!-- Modal Details Viewer & Quick Edit -->
-    <div id="claimModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+    <div id="claimModal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
             <div class="bg-slate-900 px-6 py-4 text-white flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-file-lines text-brand-400"></i>
                     <h3 class="font-bold text-base" id="modalTitle">Detalles del Reclamo</h3>
                 </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                <button onclick="closeModal()" title="Cerrar detalles" aria-label="Cerrar detalles"
+                    class="text-slate-400 hover:text-white transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            
+
             <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-sm" id="modalBody">
                 <!-- Dynamically populated modal content -->
             </div>
 
             <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end space-x-3">
-                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-xs transition-colors">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-xs transition-colors">
                     Cerrar
                 </button>
             </div>
@@ -475,15 +514,15 @@
     <!-- Firebase Modular SDK via CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
-        import { 
-            getDatabase, 
-            ref, 
-            push, 
-            set, 
-            get, 
-            child, 
-            onValue, 
-            update 
+        import {
+            getDatabase,
+            ref,
+            push,
+            set,
+            get,
+            child,
+            onValue,
+            update
         } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
 
         // Your web app's Firebase configuration
@@ -532,7 +571,7 @@
         onValue(afiliadosRef, (snapshot) => {
             const data = snapshot.val() || {};
             window.afiliadosCache = data;
-            
+
             // Re-trigger lookup if user is currently typing an affiliate
             const currentNum = document.getElementById("numeroAfiliado").value;
             if (currentNum) {
@@ -567,7 +606,7 @@
             // Sort by createdAt descending
             list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
             window.reclamosList = list;
-            
+
             // Render Table & Metrics
             window.renderClaimsTable();
             window.updateMetrics();
@@ -589,7 +628,7 @@
         }
 
         // Handle affiliate input mask & database lookup
-        window.handleAfiliadoInput = function(input) {
+        window.handleAfiliadoInput = function (input) {
             let raw = input.value.replace(/\D/g, '').slice(0, 8); // Only digits, max 8
             let formatted = raw;
 
@@ -623,16 +662,20 @@
             }
         };
 
-        // Calculate Tipo de Reintegro based on $130,000 threshold
-        window.calculateTipoReintegro = function(value) {
-            const monto = parseFloat(value) || 0;
-            const textEl = document.getElementById("tipoReintegroText");
-            const badgeEl = document.getElementById("tipoReintegroBadge");
-            const hiddenEl = document.getElementById("tipoReintegro");
+        window.calculateTipoReintegro = function (input) {
+            const item = input.closest('.claim-item');
+            const monto = parseFloat(input.value) || 0;
+            const textEl = item.querySelector('.tipo-reintegro-text');
+            const badgeEl = item.querySelector('.tipo-reintegro-badge');
+            const hiddenEl = item.querySelector('input[name="tipoReintegro"]');
 
             if (monto <= 0) {
                 textEl.innerText = "Ingrese un monto";
                 badgeEl.classList.add("hidden");
+                badgeEl.style.backgroundColor = "";
+                badgeEl.style.color = "";
+                badgeEl.style.borderColor = "";
+                item.querySelector('.tipo-reintegro-box').style.backgroundColor = "";
                 hiddenEl.value = "";
                 return;
             }
@@ -641,19 +684,62 @@
                 hiddenEl.value = "Alto costo";
                 textEl.innerText = "Reintegro de Alto Costo";
                 badgeEl.innerText = "Alto costo";
-                badgeEl.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-300";
+                badgeEl.className = "tipo-reintegro-badge text-xs px-2.5 py-1 rounded-full font-bold border";
+                badgeEl.style.backgroundColor = "#ffe4e6";
+                badgeEl.style.color = "#9f1239";
+                badgeEl.style.borderColor = "#fda4af";
+                item.querySelector('.tipo-reintegro-box').style.backgroundColor = "#fff1f2";
                 badgeEl.classList.remove("hidden");
             } else {
                 hiddenEl.value = "Bajo costo";
                 textEl.innerText = "Reintegro de Bajo Costo";
                 badgeEl.innerText = "Bajo costo";
-                badgeEl.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-teal-100 text-teal-800 border border-teal-300";
+                badgeEl.className = "tipo-reintegro-badge text-xs px-2.5 py-1 rounded-full font-bold border";
+                badgeEl.style.backgroundColor = "#ccfbf1";
+                badgeEl.style.color = "#115e59";
+                badgeEl.style.borderColor = "#5eead4";
+                item.querySelector('.tipo-reintegro-box').style.backgroundColor = "#f0fdfa";
                 badgeEl.classList.remove("hidden");
             }
         };
 
+        window.addClaimItem = function () {
+            const container = document.getElementById('claimsItems');
+            const template = container.querySelector('.claim-item');
+            const nextIndex = container.querySelectorAll('.claim-item').length;
+            const newItem = template.cloneNode(true);
+
+            newItem.dataset.claimIndex = nextIndex;
+            newItem.querySelector('h3').innerText = `Reclamo ${nextIndex + 1}`;
+            newItem.querySelectorAll('input').forEach(input => input.value = '');
+            newItem.querySelector('.tipo-reintegro-text').innerText = 'Ingrese un monto';
+            const newBadge = newItem.querySelector('.tipo-reintegro-badge');
+            newBadge.className = 'tipo-reintegro-badge hidden text-xs px-2 py-0.5 rounded-full font-bold';
+            newBadge.style.backgroundColor = '';
+            newBadge.style.color = '';
+            newBadge.style.borderColor = '';
+            newItem.querySelector('.tipo-reintegro-box').style.backgroundColor = '';
+
+            const heading = newItem.querySelector('div.flex');
+            heading.insertAdjacentHTML('beforeend', `
+                <button type="button" onclick="removeClaimItem(this)" class="text-rose-500 hover:text-rose-700 p-1" title="Quitar reclamo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `);
+            container.appendChild(newItem);
+            newItem.querySelector('input[name="monto"]').focus();
+        };
+
+        window.removeClaimItem = function (button) {
+            const item = button.closest('.claim-item');
+            item.remove();
+            document.querySelectorAll('#claimsItems .claim-item h3').forEach((heading, index) => {
+                heading.innerText = `Reclamo ${index + 1}`;
+            });
+        };
+
         // Form Submit Handler
-        window.handleFormSubmit = async function(event) {
+        window.handleFormSubmit = async function (event) {
             event.preventDefault();
 
             const btnSubmit = document.getElementById("btnSubmit");
@@ -668,14 +754,16 @@
                 const apellido = formData.get("apellido").trim();
                 const telefono = formData.get("telefono").trim();
                 const zona = formData.get("zona").trim();
-                const monto = parseFloat(formData.get("monto"));
-                const tipoReintegro = formData.get("tipoReintegro");
-                const numeroOrdenPago = formData.get("numeroOrdenPago").trim() || "N/A";
                 const delegacion = formData.get("delegacion").trim();
-                const concepto = formData.get("concepto").trim();
-                const fechaSupuestoPago = formData.get("fechaSupuestoPago");
                 const estado = formData.get("estado");
                 const descripcion = formData.get("descripcion").trim();
+                const reclamos = formData.getAll("monto").map((monto, index) => ({
+                    monto: parseFloat(monto),
+                    tipoReintegro: formData.getAll("tipoReintegro")[index],
+                    numeroOrdenPago: formData.getAll("numeroOrdenPago")[index].trim() || "N/A",
+                    concepto: formData.getAll("concepto")[index].trim(),
+                    fechaSupuestoPago: formData.getAll("fechaSupuestoPago")[index]
+                }));
 
                 // Automatic claim date/time calculation
                 const now = new Date();
@@ -707,40 +795,36 @@
                     await set(ref(db, `delegaciones/${cleanDelKey}`), { nombre: delegacion });
                 }
 
-                // 3. Save Concepto in 'conceptos' collection if new
-                if (concepto) {
-                    const cleanConcKey = concepto.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                    await set(ref(db, `conceptos/${cleanConcKey}`), { nombre: concepto });
+                // 3. Save each concept and claim independently
+                const claimRefs = [];
+                for (const reclamo of reclamos) {
+                    if (reclamo.concepto) {
+                        const cleanConcKey = reclamo.concepto.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                        await set(ref(db, `conceptos/${cleanConcKey}`), { nombre: reclamo.concepto });
+                    }
+
+                    const newClaimRef = push(ref(db, "reclamos"));
+                    await set(newClaimRef, {
+                        numeroAfiliado,
+                        nombre,
+                        apellido,
+                        telefono,
+                        zona,
+                        ...reclamo,
+                        delegacion,
+                        fechaReclamo: fechaReclamoISO,
+                        fechaReclamoFormateada: fechaReclamoFormatted,
+                        estado,
+                        descripcion,
+                        createdAt: Date.now()
+                    });
+                    claimRefs.push(newClaimRef.key);
                 }
 
-                // 4. Create new claim record in 'reclamos' collection
-                const newClaimRef = push(ref(db, "reclamos"));
-                const claimData = {
-                    numeroAfiliado,
-                    nombre,
-                    apellido,
-                    telefono,
-                    zona,
-                    monto,
-                    tipoReintegro,
-                    numeroOrdenPago,
-                    delegacion,
-                    concepto,
-                    fechaSupuestoPago,
-                    fechaReclamo: fechaReclamoISO,
-                    fechaReclamoFormateada: fechaReclamoFormatted,
-                    estado,
-                    descripcion,
-                    createdAt: Date.now()
-                };
-
-                await set(newClaimRef, claimData);
-
-                showToast("Reclamo guardado exitosamente con ID " + newClaimRef.key.slice(-6), "success");
                 resetForm();
-                
-                // Switch view to history table
-                switchTab('table');
+                switchTab('form');
+                document.getElementById("numeroAfiliado").focus();
+                showToast(`${claimRefs.length} reclamo(s) guardado(s) exitosamente`, "success");
 
             } catch (error) {
                 console.error("Error al guardar el reclamo:", error);
@@ -752,7 +836,7 @@
         };
 
         // Render claims history table
-        window.renderClaimsTable = function() {
+        window.renderClaimsTable = function () {
             const tbody = document.getElementById("claimsTableBody");
             const searchVal = document.getElementById("tableSearch").value.toLowerCase();
             const filterEstadoVal = document.getElementById("filterEstado").value;
@@ -786,7 +870,7 @@
 
             tbody.innerHTML = filtered.map(c => {
                 const badgeColor = getEstadoBadgeStyle(c.estado);
-                const tipoBadge = c.tipoReintegro === "Alto costo" 
+                const tipoBadge = c.tipoReintegro === "Alto costo"
                     ? `<span class="bg-rose-50 text-rose-700 font-bold border border-rose-200 px-2 py-0.5 rounded text-[11px]">Alto costo</span>`
                     : `<span class="bg-teal-50 text-teal-700 font-bold border border-teal-200 px-2 py-0.5 rounded text-[11px]">Bajo costo</span>`;
 
@@ -823,12 +907,12 @@
             }).join('');
         };
 
-        window.filterClaimsTable = function() {
+        window.filterClaimsTable = function () {
             window.renderClaimsTable();
         };
 
         // Update Summary Metrics
-        window.updateMetrics = function() {
+        window.updateMetrics = function () {
             const list = window.reclamosList;
             document.getElementById("stat-total").innerText = list.length;
             document.getElementById("badge-total-claims").innerText = list.length;
@@ -844,7 +928,7 @@
         };
 
         // View Modal Details
-        window.viewClaimDetails = function(claimId) {
+        window.viewClaimDetails = function (claimId) {
             const claim = window.reclamosList.find(c => c.id === claimId);
             if (!claim) return;
 
@@ -853,6 +937,9 @@
 
             modalBody.innerHTML = `
                 <div class="space-y-4">
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-black tracking-wide text-amber-800">
+                        REVISAR SISTEMA
+                    </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-2 gap-3">
                         <div>
                             <span class="text-xs font-semibold text-slate-400 uppercase">Afiliado</span>
@@ -875,7 +962,7 @@
                     <div class="grid grid-cols-2 gap-3 p-1">
                         <div>
                             <span class="text-xs font-semibold text-slate-400 uppercase">Monto Solicitado</span>
-                            <p class="text-lg font-black text-slate-900">$${(claim.monto || 0).toLocaleString('es-AR', {minimumFractionDigits: 2})}</p>
+                            <p class="text-lg font-black text-slate-900">$${(claim.monto || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
                         </div>
                         <div>
                             <span class="text-xs font-semibold text-slate-400 uppercase">Tipo Reintegro</span>
@@ -924,33 +1011,36 @@
             document.getElementById("claimModal").classList.remove("hidden");
         };
 
-        window.updateClaimStatus = async function(claimId, newStatus) {
+        window.updateClaimStatus = async function (claimId, newStatus) {
             try {
                 await update(ref(db, `reclamos/${claimId}`), { estado: newStatus });
                 showToast("Estado actualizado correctamente", "success");
-            } catch(e) {
+            } catch (e) {
                 showToast("Error al cambiar estado", "error");
             }
         };
 
-        window.closeModal = function() {
+        window.closeModal = function () {
             document.getElementById("claimModal").classList.add("hidden");
         };
 
         // Reset Form Fields
-        window.resetForm = function() {
-            document.getElementById("claimForm").reset();
+        window.resetForm = function () {
+            const form = document.getElementById("claimForm");
+            const claimsItems = document.getElementById("claimsItems");
+            claimsItems.querySelectorAll('.claim-item:not(:first-child)').forEach(item => item.remove());
+            form.reset();
+            document.getElementById("estado").value = "A la espera";
             document.getElementById("afiliado-status-pill").classList.add("hidden");
-            document.getElementById("tipoReintegroBox").innerHTML = `
-                <span id="tipoReintegroText">Ingrese un monto</span>
-                <span id="tipoReintegroBadge" class="hidden text-xs px-2 py-0.5 rounded-full font-bold"></span>
-            `;
-            document.getElementById("tipoReintegro").value = "";
+            const firstClaim = claimsItems.querySelector('.claim-item');
+            firstClaim.querySelector('.tipo-reintegro-text').innerText = "Ingrese un monto";
+            firstClaim.querySelector('.tipo-reintegro-badge').className = "tipo-reintegro-badge hidden text-xs px-2 py-0.5 rounded-full font-bold";
+            firstClaim.querySelector('input[name="tipoReintegro"]').value = "";
         };
 
         // Badge style helper
         function getEstadoBadgeStyle(estado) {
-            switch(estado) {
+            switch (estado) {
                 case "Aprobado": return "bg-emerald-100 text-emerald-800 border border-emerald-300";
                 case "Liquidado": return "bg-blue-100 text-blue-800 border border-blue-300";
                 case "En proceso de pago": return "bg-indigo-100 text-indigo-800 border border-indigo-300";
@@ -962,7 +1052,7 @@
         }
 
         // View Tab Switching
-        window.switchTab = function(tabName) {
+        window.switchTab = function (tabName) {
             const formView = document.getElementById("view-form");
             const tableView = document.getElementById("view-table");
             const tabBtnForm = document.getElementById("tab-btn-form");
@@ -984,7 +1074,7 @@
         };
 
         // Toast Messages
-        window.showToast = function(message, type = 'info') {
+        window.showToast = function (message, type = 'info') {
             const container = document.getElementById("toastContainer");
             const toast = document.createElement("div");
 
@@ -1017,4 +1107,5 @@
         }
     </script>
 </body>
+
 </html>
