@@ -76,8 +76,25 @@
                     </div>
                 </div>
 
-                <!-- Database Connection Status & Counters -->
-                <div class="flex items-center space-x-4 text-xs">
+                <!-- Navigation & Database Connection Status -->
+                <div class="flex items-center gap-2 text-xs">
+                    <nav class="flex items-center gap-1" aria-label="Navegación principal">
+                        <a href="index.html" aria-current="page" title="Nuevo reclamo"
+                            class="flex items-center gap-2 rounded-lg bg-brand-600 px-2.5 py-2 font-semibold text-white transition-colors hover:bg-brand-700">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span class="hidden sm:inline">Nuevo reclamo</span>
+                        </a>
+                        <a href="tablaReclamos.html" title="Auditoría de reclamos"
+                            class="flex items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-300 transition-colors hover:bg-slate-800 hover:text-white">
+                            <i class="fa-solid fa-table-list"></i>
+                            <span class="hidden sm:inline">Auditoría</span>
+                        </a>
+                        <a href="tablasimuladora.html" title="Simuladora de pagos"
+                            class="flex items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-300 transition-colors hover:bg-slate-800 hover:text-white">
+                            <i class="fa-solid fa-calculator"></i>
+                            <span class="hidden sm:inline">Simuladora</span>
+                        </a>
+                    </nav>
                     <div id="db-status-badge"
                         class="flex items-center space-x-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full">
                         <span class="relative flex h-2.5 w-2.5">
