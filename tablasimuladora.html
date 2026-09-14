@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simuladora de pagos de reclamos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
+    <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-900 text-white shadow-md">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-400 shadow-lg">
+                    <i class="fa-solid fa-calculator text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold leading-none">Simuladora de pagos</h1>
+                    <p class="mt-1 text-xs text-slate-400">Reclamos y afiliados agrupados por numero base</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <nav class="flex items-center gap-1 text-xs" aria-label="Navegación principal">
+                    <a href="index.html" title="Nuevo reclamo"
+                        class="flex items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-300 transition-colors hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="hidden sm:inline">Nuevo reclamo</span>
+                    </a>
+                    <a href="tablaReclamos.html" title="Auditoría de reclamos"
+                        class="flex items-center gap-2 rounded-lg px-2.5 py-2 font-semibold text-slate-300 transition-colors hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span class="hidden sm:inline">Auditoría</span>
+                    </a>
+                    <a href="tablasimuladora.html" aria-current="page" title="Simuladora de pagos"
+                        class="flex items-center gap-2 rounded-lg bg-cyan-700 px-2.5 py-2 font-semibold text-white transition-colors hover:bg-cyan-800">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span class="hidden sm:inline">Simuladora</span>
+                    </a>
+                </nav>
+                <div id="dbStatus"
+                    class="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs text-slate-300">
+                    <span id="statusDot" class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                    <span id="statusText">Conectando...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
+        <section class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total reclamos</p>
+                <p id="totalClaims" class="metric-value mt-2 text-2xl font-bold text-slate-900">0</p>
+                <p class="mt-1 text-xs text-slate-400">Base completa</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Afiliados unicos</p>
+                <p id="totalAffiliates" class="metric-value mt-2 text-2xl font-bold text-cyan-700">0</p>
+                <p class="mt-1 text-xs text-slate-400">Sin contar lo posterior a /</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Suma total</p>
+                <p id="totalAmount" class="metric-value mt-2 text-xl font-bold text-slate-900">$ 0,00</p>
+                <p class="mt-1 text-xs text-slate-400">Todos los reclamos</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Suma filtrada</p>
+                <p id="filteredAmount" class="metric-value mt-2 text-xl font-bold text-amber-700">$ 0,00</p>
+                <p id="filteredSummary" class="mt-1 text-xs text-slate-400">0 reclamos visibles</p>
+            </div>
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Pago simulado</p>
+                <p id="selectedAmount" class="metric-value mt-2 text-xl font-bold text-emerald-800">$ 0,00</p>
+                <p id="selectedSummary" class="mt-1 text-xs text-emerald-700">0 reclamos seleccionados</p>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+                <div>
+                    <h2 class="flex items-center gap-2 text-base font-bold text-slate-900">
+                        <i class="fa-solid fa-filter text-cyan-600"></i> Buscar y filtrar reclamos
+                    </h2>
+                    <p class="mt-1 text-xs text-slate-500">Los importes filtrados se actualizan en tiempo real.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="selectVisible()"
+                        class="rounded-lg bg-cyan-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-cyan-800">
+                        <i class="fa-solid fa-check-double mr-1"></i> Seleccionar visibles
+                    </button>
+                    <button type="button" onclick="clearSelection()"
+                        class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200">
+                        <i class="fa-solid fa-eraser mr-1"></i> Limpiar seleccion
+                    </button>
+                    <button type="button" onclick="reloadData()"
+                        class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200">
+                        <i class="fa-solid fa-rotate mr-1"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+                <label class="relative">
+                    <span class="sr-only">Buscar</span>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+                    <input id="searchInput" oninput="applyFilters()" type="search"
+                        placeholder="Afiliado, nombre, concepto..."
+                        class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-9 pr-3 text-xs outline-none focus:border-cyan-600 focus:bg-white focus:ring-2 focus:ring-cyan-600/20">
+                </label>
+                <select id="filterEstado" title="Filtrar por estado" onchange="applyFilters()"
+                    class="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-cyan-600">
+                    <option value="">Todos los estados</option>
+                </select>
+                <select id="filterTipo" title="Filtrar por tipo de costo" onchange="applyFilters()"
+                    class="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-cyan-600">
+                    <option value="">Todos los tipos</option>
+                    <option value="Alto costo">Alto costo</option>
+                    <option value="Bajo costo">Bajo costo</option>
+                </select>
+                <select id="filterDelegacion" title="Filtrar por delegacion" onchange="applyFilters()"
+                    class="rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-cyan-600">
+                    <option value="">Todas las delegaciones</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div
+                class="flex flex-col justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900">Reclamos para simular</h2>
+                    <p class="text-xs text-slate-500">Marque los reclamos que desea incluir en el pago.</p>
+                </div>
+                <p id="tableSummary" class="text-xs font-semibold text-slate-500">Cargando...</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-left text-xs">
+                    <thead class="bg-slate-900 font-semibold uppercase tracking-wide text-slate-300">
+                        <tr>
+                            <th class="w-12 px-4 py-3 text-center"><input id="selectAll"
+                                    onchange="toggleAllVisible(this.checked)" type="checkbox"
+                                    title="Seleccionar todos los visibles"
+                                    class="h-4 w-4 rounded border-slate-400 text-cyan-600"></th>
+                            <th class="px-4 py-3">N. afiliado</th>
+                            <th class="px-4 py-3">Afiliado</th>
+                            <th class="px-4 py-3">Delegacion / concepto</th>
+                            <th class="px-4 py-3">Estado</th>
+                            <th class="px-4 py-3 text-right">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="claimsTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCV3Wt6dX92Mx13OtTeo7tDjrnpowlxO48",
+            authDomain: "reintegros-808db.firebaseapp.com",
+            databaseURL: "https://reintegros-808db-default-rtdb.firebaseio.com",
+            projectId: "reintegros-808db",
+            storageBucket: "reintegros-808db.firebasestorage.app",
+            messagingSenderId: "560013503062",
+            appId: "1:560013503062:web:e13ca411951570cc5f29f7",
+            measurementId: "G-HNDK22KS65"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        window.reclamosCache = [];
+        window.selectedClaims = new Set();
+        window.visibleClaims = [];
+
+        const money = value => Number(value || 0).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
+        const text = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+        const baseAffiliate = value => String(value ?? '').split('/')[0].trim().toLowerCase();
+        const amount = claim => Number(claim.monto || 0);
+
+        function setConnection(connected) {
+            document.getElementById('statusText').textContent = connected ? 'Firebase conectado' : 'Desconectado / offline';
+            document.getElementById('statusDot').className = `h-2.5 w-2.5 rounded-full ${connected ? 'bg-emerald-400' : 'bg-rose-500'}`;
+        }
+
+        function updateSelect(id, values, label) {
+            const select = document.getElementById(id);
+            const current = select.value;
+            select.innerHTML = `<option value="">${label}</option>` + values.map(value => `<option value="${text(value)}">${text(value)}</option>`).join('');
+            if (values.includes(current)) select.value = current;
+        }
+
+        function updateMetrics(filtered) {
+            const claims = window.reclamosCache;
+            const unique = new Set(claims.map(claim => baseAffiliate(claim.numeroAfiliado)).filter(Boolean));
+            const filteredUnique = new Set(filtered.map(claim => baseAffiliate(claim.numeroAfiliado)).filter(Boolean));
+            const selected = claims.filter(claim => window.selectedClaims.has(claim.id));
+            document.getElementById('totalClaims').textContent = claims.length.toLocaleString('es-AR');
+            document.getElementById('totalAffiliates').textContent = unique.size.toLocaleString('es-AR');
+            document.getElementById('totalAmount').textContent = money(claims.reduce((sum, claim) => sum + amount(claim), 0));
+            document.getElementById('filteredAmount').textContent = money(filtered.reduce((sum, claim) => sum + amount(claim), 0));
+            document.getElementById('filteredSummary').textContent = `${filtered.length.toLocaleString('es-AR')} reclamos / ${filteredUnique.size.toLocaleString('es-AR')} afiliados`;
+            document.getElementById('selectedAmount').textContent = money(selected.reduce((sum, claim) => sum + amount(claim), 0));
+            document.getElementById('selectedSummary').textContent = `${selected.length.toLocaleString('es-AR')} reclamos seleccionados`;
+        }
+
+        function renderTable(list) {
+            window.visibleClaims = list;
+            const body = document.getElementById('claimsTableBody');
+            document.getElementById('tableSummary').textContent = `${list.length.toLocaleString('es-AR')} visibles de ${window.reclamosCache.length.toLocaleString('es-AR')}`;
+            body.innerHTML = list.length ? list.map(claim => {
+                const checked = window.selectedClaims.has(claim.id) ? 'checked' : '';
+                return `<tr class="transition hover:bg-cyan-50/40 ${checked ? 'bg-emerald-50/50' : ''}">
+                    <td class="px-4 py-3 text-center"><input type="checkbox" data-claim-id="${text(claim.id)}" onchange="toggleClaim('${text(claim.id)}', this.checked)" ${checked} class="claim-checkbox h-4 w-4 rounded border-slate-300 text-emerald-600"></td>
+                    <td class="px-4 py-3 font-mono font-bold text-slate-900">${text(claim.numeroAfiliado || '-')}</td>
+                    <td class="px-4 py-3"><div class="font-semibold text-slate-800">${text(`${claim.nombre || ''} ${claim.apellido || ''}`.trim() || '-')}</div><div class="text-[11px] text-slate-400">${text(claim.telefono || '')}</div></td>
+                    <td class="px-4 py-3"><div class="font-semibold text-slate-800">${text(claim.delegacion || '-')}</div><div class="text-[11px] text-cyan-700">${text(claim.concepto || '-')}</div></td>
+                    <td class="px-4 py-3 text-slate-600">${text(claim.estado || '-')}</td>
+                    <td class="px-4 py-3 text-right font-bold text-slate-900">${money(amount(claim))}</td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="6" class="py-12 text-center text-slate-400"><i class="fa-solid fa-folder-open mb-2 block text-3xl text-slate-300"></i>No hay reclamos que coincidan con los filtros.</td></tr>';
+            updateSelectAllState();
+        }
+
+        window.applyFilters = function () {
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            const estado = document.getElementById('filterEstado').value;
+            const tipo = document.getElementById('filterTipo').value;
+            const delegacion = document.getElementById('filterDelegacion').value;
+            const filtered = window.reclamosCache.filter(claim => {
+                const searchable = [claim.numeroAfiliado, claim.nombre, claim.apellido, claim.delegacion, claim.concepto, claim.numeroOrdenPago].join(' ').toLowerCase();
+                return (!search || searchable.includes(search)) && (!estado || claim.estado === estado) && (!tipo || claim.tipoReintegro === tipo) && (!delegacion || claim.delegacion === delegacion);
+            });
+            renderTable(filtered);
+            updateMetrics(filtered);
+        };
+
+        window.toggleClaim = function (id, checked) {
+            if (checked) window.selectedClaims.add(id); else window.selectedClaims.delete(id);
+            applyFilters();
+        };
+
+        window.toggleAllVisible = function (checked) {
+            window.visibleClaims.forEach(claim => checked ? window.selectedClaims.add(claim.id) : window.selectedClaims.delete(claim.id));
+            applyFilters();
+        };
+
+        window.selectVisible = function () {
+            window.visibleClaims.forEach(claim => window.selectedClaims.add(claim.id));
+            applyFilters();
+        };
+
+        window.clearSelection = function () {
+            window.selectedClaims.clear();
+            applyFilters();
+        };
+
+        function updateSelectAllState() {
+            const selectAll = document.getElementById('selectAll');
+            const visible = window.visibleClaims;
+            const selectedCount = visible.filter(claim => window.selectedClaims.has(claim.id)).length;
+            selectAll.checked = visible.length > 0 && selectedCount === visible.length;
+            selectAll.indeterminate = selectedCount > 0 && selectedCount < visible.length;
+        }
+
+        window.reloadData = function () {
+            document.getElementById('statusText').textContent = 'Actualizando...';
+        };
+
+        onValue(ref(db, '.info/connected'), snapshot => setConnection(snapshot.val() === true));
+        onValue(ref(db, 'reclamos'), snapshot => {
+            const data = snapshot.val() || {};
+            window.reclamosCache = Object.entries(data).map(([id, claim]) => ({ id, ...claim })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            updateSelect('filterEstado', [...new Set(window.reclamosCache.map(claim => claim.estado).filter(Boolean))].sort(), 'Todos los estados');
+            updateSelect('filterDelegacion', [...new Set(window.reclamosCache.map(claim => claim.delegacion).filter(Boolean))].sort(), 'Todas las delegaciones');
+            window.selectedClaims = new Set([...window.selectedClaims].filter(id => window.reclamosCache.some(claim => claim.id === id)));
+            window.applyFilters();
+        }, error => {
+            setConnection(false);
+            document.getElementById('claimsTableBody').innerHTML = `<tr><td colspan="6" class="py-12 text-center text-rose-600">No se pudieron cargar los reclamos: ${text(error.message)}</td></tr>`;
+        });
+    </script>
+</body>
+
+</html>
